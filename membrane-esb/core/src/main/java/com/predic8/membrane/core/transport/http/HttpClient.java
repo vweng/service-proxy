@@ -137,8 +137,10 @@ public class HttpClient {
 					exc.setTargetConnection(con);
 				}
 				Response response = doCall(exc, con);
+				/*
 				boolean retry = 500 <= response.getStatusCode() && response.getStatusCode() < 600; 
 				if (!retry || counter == maxRetries-1)
+				*/
 					return response;
 				// java.net.SocketException: Software caused connection abort: socket write error
 			} catch (ConnectException e) {
