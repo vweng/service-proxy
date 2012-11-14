@@ -1,6 +1,9 @@
 Membrane ESB Change Log
 =============================================================================
 
+* [usage improvement] HTTPClient keepAliveTimeout can now be configured
+  e.g. using <httpClient keepAliveTimeout="30000" /> for 30 seconds.
+
 * [release] 3.4.7
 
 * [temporary workaround] reduced keep-alive timeout to 13s and do not
