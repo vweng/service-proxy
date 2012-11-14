@@ -1,0 +1,69 @@
+# /
+/target
+/membrane.log
+/.settings
+/.project
+
+# /cli/
+/cli/.classpath
+/cli/.project
+/cli/.settings
+/cli/target
+/cli/conf
+
+# /cli/examples/router/custom-interceptor/
+/cli/examples/router/custom-interceptor/dist
+
+# /cli/examples/router/loadbalancer-session-3/
+/cli/examples/router/loadbalancer-session-3/build
+
+# /cli/examples/router/versioning/routing/
+/cli/examples/router/versioning/routing/build
+
+# /cli/examples/router/versioning/xslt/
+/cli/examples/router/versioning/xslt/build
+
+# /core/
+/core/.classpath
+/core/.project
+/core/target
+/core/.settings
+/core/temp
+
+# /karaf-deployer/
+/karaf-deployer/.project
+/karaf-deployer/.classpath
+/karaf-deployer/target
+/karaf-deployer/.settings
+/karaf-deployer/.settings
+
+# /osgi/
+/osgi/.classpath
+/osgi/.project
+/osgi/target
+/osgi/.settings
+
+# /osgi-extender/
+/osgi-extender/.settings
+/osgi-extender/.classpath
+/osgi-extender/target
+/osgi-extender/.project
+/osgi-extender/.settings
+
+# /sar/
+/sar/.settings
+/sar/.classpath
+/sar/.project
+/sar/target
+
+# /test/
+/test/.settings
+/test/.project
+/test/.classpath
+/test/target
+
+# /war/
+/war/.classpath
+/war/.project
+/war/target
+/war/.settings
