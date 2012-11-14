@@ -1,6 +1,16 @@
 Membrane ESB Change Log
 =============================================================================
 
+* [release] 3.4.7
+
+* [temporary workaround] reduced keep-alive timeout to 13s and do not
+  reuse connections lingering in the pool longer than 13s
+
+* [release] 3.4.6
+
+* [temporary behavioral change] do not retry/failover when status code
+  500 is received
+
 * [release] 3.4.5
 
 * [improvement] set Default-Implementation and Default-Specification in
