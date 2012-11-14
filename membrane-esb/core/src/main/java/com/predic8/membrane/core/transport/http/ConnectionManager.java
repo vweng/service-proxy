@@ -51,7 +51,8 @@ public class ConnectionManager {
 
 	private static Log log = LogFactory.getLog(ConnectionManager.class.getName());
 	
-	private static final long CLOSE_AFTER_MILLISECONDS = 30 * 1000; 
+	private static final long CLOSE_AFTER_MILLISECONDS = 13 * 1000; 
+	private static final long AUTO_CLOSE_AFTER_MILLISECONDS = 60 * 1000; 
 	
 	private static class ConnectionKey {
 		public final InetAddress host;
@@ -78,11 +79,11 @@ public class ConnectionManager {
 	
 	private static class OldConnection {
 		public final Connection connection;
-		public final long lastUse;
+		public final long timeout;
 		
 		public OldConnection(Connection connection) {
 			this.connection = connection;
-			this.lastUse = System.currentTimeMillis();
+			this.timeout = System.currentTimeMillis() + CLOSE_AFTER_MILLISECONDS;
 		}
 	}
 	
@@ -100,7 +101,7 @@ public class ConnectionManager {
 				if (closeOldConnections() == 0 && shutdownWhenDone)
 					timer.cancel();
 			}
-		}, CLOSE_AFTER_MILLISECONDS, CLOSE_AFTER_MILLISECONDS);
+		}, AUTO_CLOSE_AFTER_MILLISECONDS, AUTO_CLOSE_AFTER_MILLISECONDS);
 	}
 	
 	public Connection getConnection(InetAddress host, int port, String localHost, SSLContext sslContext) throws UnknownHostException, IOException {
@@ -110,11 +111,17 @@ public class ConnectionManager {
 		log.debug("Number of connections in pool: " + numberInPool.get());
 		
 		ConnectionKey key = new ConnectionKey(host, port);
+		long now = System.currentTimeMillis();
 		
 		synchronized(this) {
 			ArrayList<OldConnection> l = availableConnections.get(key);
-			if (l != null && l.size() > 0)
-				return l.remove(l.size()-1).connection;
+			if (l != null) {
+				while(l.size() > 0) {
+					OldConnection c = l.remove(l.size()-1);
+					if (c.timeout > now)
+						return c.connection;
+				}
+			}
 		}
 
 		Connection result = Connection.open(host, port, localHost, sslContext, this);
@@ -146,16 +153,16 @@ public class ConnectionManager {
 	
 	private int closeOldConnections() {
 		ArrayList<ConnectionKey> toRemove = new ArrayList<ConnectionKey>();
-		long deathPoint = System.currentTimeMillis() - CLOSE_AFTER_MILLISECONDS;
+		long now = System.currentTimeMillis();
 		log.debug("closing old connections");
 		int closed = 0, remaining;
 		synchronized(this) {
-			// close connections older than CLOSE_AFTER_MILLISECONDS 
+			// close connections after their timeout
 			for (Map.Entry<ConnectionKey, ArrayList<OldConnection>> e : availableConnections.entrySet()) {
 				ArrayList<OldConnection> l = e.getValue();
 				for (int i = 0; i < l.size(); i++) {
 					OldConnection o = l.get(i);
-					if (o.lastUse < deathPoint) {
+					if (o.timeout < now) {
 						// replace [i] by [last]
 						if (i == l.size() - 1)
 							l.remove(i);
