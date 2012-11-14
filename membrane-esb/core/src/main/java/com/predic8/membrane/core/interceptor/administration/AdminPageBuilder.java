@@ -470,6 +470,8 @@ public class AdminPageBuilder extends Html {
 		switch (n.getStatus()) { 
 			case TAKEOUT:
 				return "In take out";
+			default:
+				break;
 		}
 		return ""+n.getStatus();
 	}
