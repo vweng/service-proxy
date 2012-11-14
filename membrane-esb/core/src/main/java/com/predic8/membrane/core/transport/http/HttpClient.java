@@ -48,23 +48,28 @@ public class HttpClient {
 
 	private static Log log = LogFactory.getLog(HttpClient.class.getName());
 
-	private final ConnectionManager conMgr = new ConnectionManager();
+	private final ConnectionManager conMgr;
 	private final ProxyConfiguration proxy;
 	private final int timeBetweenTries = 250;
 	private final int maxRetries;
 	private final boolean adjustHostHeader;
+	private final boolean failoverOn5XX;
 	
 	public HttpClient() {
+		conMgr = new ConnectionManager(30);
 		proxy = null;
 		maxRetries = 5;
 		adjustHostHeader = false;
+		failoverOn5XX = false;
 	}
 	
-	public HttpClient(Router router) {
+	public HttpClient(Router router, long keepAliveTimeout) {
+		conMgr = new ConnectionManager(keepAliveTimeout);
 		Proxies cfg = router.getConfigurationManager().getProxies();
 		adjustHostHeader = cfg.getAdjustHostHeader();
 		maxRetries = router.getTransport().getHttpClientRetries();
 		proxy = cfg.getProxyConfiguration();
+		this.failoverOn5XX = false; // TODO: make configurable 
 	}
 	
 	@Override
@@ -137,10 +142,8 @@ public class HttpClient {
 					exc.setTargetConnection(con);
 				}
 				Response response = doCall(exc, con);
-				/*
-				boolean retry = 500 <= response.getStatusCode() && response.getStatusCode() < 600; 
-				if (!retry || counter == maxRetries-1)
-				*/
+				boolean is5XX = 500 <= response.getStatusCode() && response.getStatusCode() < 600; 
+				if (!failoverOn5XX || !is5XX || counter == maxRetries-1)
 					return response;
 				// java.net.SocketException: Software caused connection abort: socket write error
 			} catch (ConnectException e) {

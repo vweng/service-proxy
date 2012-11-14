@@ -16,6 +16,9 @@ package com.predic8.membrane.core.interceptor;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 
+import javax.xml.stream.XMLStreamReader;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,11 +31,19 @@ public class HTTPClientInterceptor extends AbstractInterceptor {
 
 	private static Log log = LogFactory.getLog(HTTPClientInterceptor.class.getName());
 
+	private long keepAliveTimeout = 13000;
+	
 	private volatile HttpClient httpClient;
 	
 	public HTTPClientInterceptor() {
 		name="HTTPClient";
 		setFlow(Flow.REQUEST);
+	}
+	
+	@Override
+	protected void parseAttributes(XMLStreamReader token) throws Exception {
+		super.parseAttributes(token);
+		keepAliveTimeout = Integer.parseInt(StringUtils.defaultIfEmpty(token.getAttributeValue("", "keepAliveTimeout"), "13000"));
 	}
 	
 	@Override
@@ -67,7 +78,7 @@ public class HTTPClientInterceptor extends AbstractInterceptor {
 			synchronized(this) {
 				result = httpClient;
 				if (result == null)
-					httpClient = result = new HttpClient(router);
+					httpClient = result = new HttpClient(router, keepAliveTimeout);
 			}
 		return result;
 	}
@@ -75,6 +86,14 @@ public class HTTPClientInterceptor extends AbstractInterceptor {
 	@Override
 	public String getHelpId() {
 		return "http-client";
+	}
+	
+	public long getKeepAliveTimeout() {
+		return keepAliveTimeout;
+	}
+	
+	public void setKeepAliveTimeout(long keepAliveTimeout) {
+		this.keepAliveTimeout = keepAliveTimeout;
 	}
 
 }

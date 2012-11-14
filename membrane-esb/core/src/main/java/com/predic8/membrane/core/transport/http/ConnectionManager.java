@@ -30,7 +30,7 @@ import com.google.common.base.Objects;
 import com.predic8.membrane.core.transport.SSLContext;
 
 /**
- * Pools TCP/IP connections, holding them open for 30 seconds.
+ * Pools TCP/IP connections, holding them open for a configurable number of milliseconds.
  * 
  * With keep-alive use as follows:
  * <code>
@@ -51,8 +51,8 @@ public class ConnectionManager {
 
 	private static Log log = LogFactory.getLog(ConnectionManager.class.getName());
 	
-	private static final long CLOSE_AFTER_MILLISECONDS = 13 * 1000; 
-	private static final long AUTO_CLOSE_AFTER_MILLISECONDS = 60 * 1000; 
+	private final long keepAliveTimeout; 
+	private final long autoCloseInterval; 
 	
 	private static class ConnectionKey {
 		public final InetAddress host;
@@ -81,9 +81,9 @@ public class ConnectionManager {
 		public final Connection connection;
 		public final long timeout;
 		
-		public OldConnection(Connection connection) {
+		public OldConnection(Connection connection, long lingeringTimeout) {
 			this.connection = connection;
-			this.timeout = System.currentTimeMillis() + CLOSE_AFTER_MILLISECONDS;
+			this.timeout = System.currentTimeMillis() + lingeringTimeout;
 		}
 	}
 	
@@ -93,7 +93,9 @@ public class ConnectionManager {
 	private Timer timer;
 	private volatile boolean shutdownWhenDone = false;
 
-	public ConnectionManager() {
+	public ConnectionManager(long keepAliveTimeout) {
+		this.keepAliveTimeout = keepAliveTimeout;
+		this.autoCloseInterval = keepAliveTimeout * 2;
 		timer = new Timer("Connection Closer", true);
 		timer.schedule(new TimerTask() {
 			@Override
@@ -101,7 +103,7 @@ public class ConnectionManager {
 				if (closeOldConnections() == 0 && shutdownWhenDone)
 					timer.cancel();
 			}
-		}, AUTO_CLOSE_AFTER_MILLISECONDS, AUTO_CLOSE_AFTER_MILLISECONDS);
+		}, autoCloseInterval, autoCloseInterval);
 	}
 	
 	public Connection getConnection(InetAddress host, int port, String localHost, SSLContext sslContext) throws UnknownHostException, IOException {
@@ -139,7 +141,7 @@ public class ConnectionManager {
 		}
 		
 		ConnectionKey key = new ConnectionKey(connection.socket.getInetAddress(), connection.socket.getPort());
-		OldConnection o = new OldConnection(connection);
+		OldConnection o = new OldConnection(connection, keepAliveTimeout);
 		ArrayList<OldConnection> l;
 		synchronized(this) {
 			l = availableConnections.get(key);
