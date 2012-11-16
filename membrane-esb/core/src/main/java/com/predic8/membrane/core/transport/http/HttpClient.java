@@ -56,7 +56,7 @@ public class HttpClient {
 	private final boolean failoverOn5XX;
 	
 	public HttpClient() {
-		conMgr = new ConnectionManager(30);
+		conMgr = new ConnectionManager(30000);
 		proxy = null;
 		maxRetries = 5;
 		adjustHostHeader = false;
