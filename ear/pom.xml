@@ -9,7 +9,7 @@
   
   	<properties>
 		<project.ear.name>CC-API-Proxy</project.ear.name>
-		<project.ear.version>1.3.0</project.ear.version>
+		<project.ear.version>1.3.4</project.ear.version>
 	</properties>
 
     <parent>
