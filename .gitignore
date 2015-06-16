@@ -69,3 +69,16 @@
 /war/target
 /war/.settings
 /war/memrouter.log
+
+/war/src/main/webapp/WEB-INF/schemas
+/war/src/main/webapp/test.jsp
+/war/src/main/webapp/WEB-INF/ibm-web-bnd.xml
+/war/src/main/webapp/WEB-INF/ibm-web-ext.xml
+/war/src/main/webapp/WEB-INF/truststore.jks
+
+# /ear/
+/ear/target
+
+# /env/
+/env/target
+
