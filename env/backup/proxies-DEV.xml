@@ -1,0 +1,130 @@
+<!--
+	Routing Configuration
+	
+	Here you can configure routing rules for Membrane ESB. It
+	contains some proxy definitions to show how to setup routing. Please make sure to
+	remove these rules before you put the router into production. More sample
+	configurations you can find in the examples directory of the Membrane ESB distribution.
+	
+	A quick start guide is available at: 
+	http://membrane-soa.org/esb-doc/current/overview/ .
+	
+	See the reference at:
+	http://membrane-soa.org/esb-doc/current/configuration/reference/ .  
+-->
+<spring:beans xmlns="http://membrane-soa.org/proxies/1/"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:web="http://membrane-soa.org/war/1/"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+					    http://membrane-soa.org/proxies/1/ http://membrane-soa.org/schemas/proxies-1.xsd
+					    http://membrane-soa.org/war/1/ http://membrane-soa.org/schemas/war-1.xsd">
+      	 
+	<!--
+		This is the configuration using Application Server embedding (see web.xml).
+		It uses the Web Containers's connectors (see configuration of the web
+		server) and configured paths (see web.xml).
+	-->
+
+	<limitedMemoryExchangeStore id="memoryExchangeStore" />
+
+	<router hotDeploy="false" exchangeStore="memoryExchangeStore">
+
+		<web:servletTransport id="transport">
+			<headerFilter>
+				<exclude>Connection</exclude>
+				<exclude>Content-Encoding</exclude>
+				<exclude>Content-Length</exclude>
+				<exclude>Content-MD5</exclude>
+				<exclude>Server</exclude>
+				<exclude>Transfer-Encoding</exclude>
+			</headerFilter>
+			<ruleMatching />
+			<exchangeStore name="memoryExchangeStore" />
+			<dispatching />
+<!--			 
+			<transform xslt="strip.xslt" />
+			<wsdlRewriter />
+-->			
+			<reverseProxying />
+			<userFeature />
+			<httpClient />
+		</web:servletTransport>
+	
+		<!-- Sets up the Administration Web Interface below "/admin". -->
+	    <serviceProxy>
+	    	<path isRegExp="true">^/admin.*</path>
+	    	<basicAuthentication>
+				<user name="admin" password="NoProduction" />
+			</basicAuthentication>	
+			<adminConsole />
+	    </serviceProxy>
+	      	
+<!--				
+		<serviceProxy>
+			<rewriter>
+				<map  do="rewrite"  from="^/(.*)" to="/invoke/testVWeng:$1" />
+			</rewriter> 
+			<target host="hamlet-11.inet.toronto.ca" port="5555" />
+		</serviceProxy>
+-->
+
+		<serviceProxy name="UtilityAccount" >
+			<!-- This rule is built for UtilityAccount project -->
+			<request>
+				<groovy>
+					def ua = exc.request.header.getFirstValue("User-Agent")
+					def ct = exc.request.header.getFirstValue("Content-Type")
+					def ex = exc.request.header.getFirstValue("Expect")
+					println "Method: ${exc.request.method}, Content-Type:${ct}, Expect:${ex}, Agent:${ua}"
+					
+					if (ua &amp;&amp; (ua.contains("MSIE 8")||ua.contains("MSIE 7"))) {
+						// workaround for IE8 (which sometimes also use MSIE 7 as user agent),
+						// as it doesn't support CORS without setting content-type to text/plain. 
+						// and we need it to be x-www-form-urlencoded otherwise webMethods won't work.
+						exc.request.header.removeFields("Content-Type")
+						exc.request.header.add("Content-Type", "application/x-www-form-urlencoded")
+					}
+					
+					if (ex &amp;&amp; ex.contains("100-Continue")) {
+						exc.request.header.removeFields("Expect") // remove Expect: 100-Continue header injected by WAS8.0, otherwise wM flops
+					}
+					
+					exc.request.header.removeFields("Authorization") // remove any authorization header so as to allow wM login to work
+					exc.request.header.setAuthorization("cc_api",System.getProperty("ccapi.password"))
+					//exc.request.header.add("Authorization","Basic "+System.getProperty("ccapi.credential"))
+					
+					if (exc.request.method==Request.METHOD_POST) {
+						CONTINUE // continue to validate the http boday using the next groovy interceptor
+					} else if (exc.request.method==Request.METHOD_GET) {				
+						CONTINUE // somehow RETURN generates no-reponse error, so use continue as for GET the body contains nothing and will pass validation
+					} else {
+						println "Only allows POST or GET but received ${exc.request.method}"
+						ABORT 
+					}
+				</groovy>
+				<groovy>
+					// remove the "param=" prefix so as to validate against json schema, cannot use regExReplacer tag as it requires content-type to be xml/html
+					exc.request.setBodyContent(exc.request.getBodyAsStringDecoded().replaceFirst("validateRequest=", "").getBytes(exc.request.getCharset()));
+				</groovy>
+				<validator jsonSchema="UtilityAccount.json"  failureHandler="log" />
+				<groovy>
+					// prepend the "param=" prefix back so as to pass value to wM
+					def bodyString = exc.request.getBodyAsStringDecoded();
+					if (bodyString)
+						exc.request.setBodyContent(("validateRequest="+bodyString).getBytes(exc.request.getCharset()));
+				</groovy>
+			</request> 
+			<rewriter>
+				<map do="rewrite" from="^/svcaccount_v1/UtilityAccount/validate" to="/rest/COTIdmaAccountAccessAPI/REST/svcaccount_v1/UtilityAccount/validate" />
+				<map do="rewrite" from="^/svcaccount_v1/UtilityAccount/(\d{9}-\d{9}-\d{2}[\?=0-9a-zA-Z_&amp;]*)" 
+					to="/rest/COTIdmaAccountAccessAPI/REST/svcaccount_v1/UtilityAccount/$1" />
+			</rewriter> 
+			<target host="cheetah-b4.corp.toronto.ca" port="5680">
+				<!--ssl ignoreTimestampCheckFailure="true" /-->
+			</target>
+		</serviceProxy>
+
+	</router>
+
+</spring:beans>

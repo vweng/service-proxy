@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "https://secure.toronto.ca/cc_api/svcaccount_v1/PropertyTax/view",
+  "type": "object",
+  "oneOf": [
+{ "additionalProperties": false,
+"required": [ "ROLL_NUMBER", "LAST_NAME", "CUSTOMER_NUMBER"],
+"properties": {
+    "ROLL_NUMBER": {
+      "type": "string",
+      "pattern": "^\\d{2}-\\d{2}-\\d{2}-\\d{1}-\\d{3}-\\d{5}-\\d{4}-\\d{2}$",
+      "maxLength":28
+    },
+    "LAST_NAME": {
+      "type": "string",
+	  "pattern": "^[0-9a-zA-Z]{1,100}$",
+	  "maxLength":100
+    },
+    "POSTAL_CODE": {
+      "type": "string",
+      "pattern": "^[a-zA-Z]{1}\\d{1}[a-zA-Z]{1} \\d{1}[a-zA-Z]{1}\\d{1}$",
+      "maxLength":7
+    },
+    "CUSTOMER_NUMBER": {
+      "type": "string",
+      "pattern": "^\\d{1,9}$",
+      "maxLength":9
+    }
+}}
+]
+
+}

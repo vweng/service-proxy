@@ -89,6 +89,15 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<!-- added by Victor
+					Exclude xml-apis-*.jar since it conflicts with WebSphere's built-in one
+					after we change classloading to PARENT_LAST
+					-->
+					<packagingExcludes>
+						WEB-INF/lib/xml-apis-*.jar
+					</packagingExcludes>
+				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>

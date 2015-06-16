@@ -65,6 +65,8 @@
 	</mailingLists>
 
 	<modules>
+		<module>env</module> <!-- added by Victor -->
+		<module>ear</module> <!-- added by Victor -->
 		<module>annot</module>
 		<module>core</module>
 		<module>distribution</module>
@@ -223,6 +225,11 @@
 				<artifactId>json-schema-validator</artifactId>
 				<version>2.1.8</version>
 			</dependency>
+<dependency><!-- added by Victor -->
+	<groupId>com.github.fge</groupId>
+	<artifactId>jackson-coreutils</artifactId>
+	<version>1.8</version>
+</dependency>			
 			<dependency>
 				<groupId>javax.servlet</groupId>
 				<artifactId>servlet-api</artifactId>

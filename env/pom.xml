@@ -1,0 +1,116 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+<!-- Author: Victor Weng. Acknowledgement: Fei Tian -->
+
+  <groupId>ca.toronto.ccc</groupId>
+  <artifactId>service-proxy-env</artifactId>
+  
+  <description>Inject ENV based configurations for IBM WebSphere deployment.</description>
+
+    <parent>
+        <groupId>org.membrane-soa</groupId>
+        <artifactId>service-proxy-parent</artifactId>
+        <relativePath>../pom.xml</relativePath>
+		<version>4.0.20</version>
+    </parent>
+
+	<profiles>
+		<profile>
+			<id>DEV</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<target.env>DEV</target.env>
+			</properties>
+		</profile>
+		<profile>
+			<id>QA</id>
+			<properties>
+				<target.env>QA</target.env>
+			</properties>
+		</profile>
+		<profile>
+			<id>Staging</id>
+			<properties>
+				<target.env>Staging</target.env>
+			</properties>
+		</profile>		
+		<profile>
+			<id>PROD</id>
+			<properties>
+				<target.env>PROD</target.env>
+			</properties>
+		</profile>
+	</profiles>
+	
+	<properties>
+		<project.war.dir>../war/src/main/webapp</project.war.dir>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+				  <execution>
+					<phase>process-sources</phase>
+					<configuration>
+					  <tasks>
+						<!--
+						  Place any Ant task here. You can add anything
+						  you can add between <target> and </target> in a
+						  build.xml.
+						-->
+							<copy file="src/proxies-${target.env}.xml" tofile="${project.war.dir}/WEB-INF/proxies.xml" overwrite="true" />
+							<copy file="src/ibm-web-bnd.xml" tofile="${project.war.dir}/WEB-INF/ibm-web-bnd.xml" overwrite="true" />
+							<copy file="src/ibm-web-ext.xml" tofile="${project.war.dir}/WEB-INF/ibm-web-ext.xml" overwrite="true" />
+							<copy file="src/truststore.jks" tofile="${project.war.dir}/WEB-INF/truststore.jks" overwrite="true" />
+							
+							<copy file="src/schemas/UtilityAccount.json" tofile="${project.war.dir}/WEB-INF/schemas/UtilityAccount.json" overwrite="true" />		
+							<copy file="src/schemas/ParkingTicket.json" tofile="${project.war.dir}/WEB-INF/schemas/ParkingTicket.json" overwrite="true" />
+							<copy file="src/schemas/PropertyTax.json" tofile="${project.war.dir}/WEB-INF/schemas/PropertyTax.json" overwrite="true" />
+							
+							<copy file="src/test.jsp" tofile="${project.war.dir}/test.jsp" overwrite="true" />
+							
+							<!-- taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
+							<if>
+							  <equals arg1="${target.env}" arg2="PROD" />
+							  <then>
+								<copy file="src/testPROD.jsp" tofile="${project.war.dir}/test.jsp" overwrite="true" />
+							  </then>
+							  <else>
+								<copy file="src/test.jsp" tofile="${project.war.dir}/test.jsp" overwrite="true" />
+							  </else>
+							</if -->
+
+					  </tasks>
+					</configuration>
+					<goals>
+					  <goal>run</goal>
+					</goals>
+				  </execution>
+				</executions>
+				<dependencies>
+				  <dependency>
+					<groupId>ant-contrib</groupId>
+					<artifactId>ant-contrib</artifactId>
+					<version>1.0b3</version>
+					<exclusions>
+					  <exclusion>
+						<groupId>ant</groupId>
+						<artifactId>ant</artifactId>
+					  </exclusion>
+					</exclusions>
+				  </dependency>
+				  <dependency>
+					<groupId>org.apache.ant</groupId>
+					<artifactId>ant-nodeps</artifactId>
+					<version>1.8.1</version>
+				  </dependency>
+				</dependencies>
+			 </plugin>
+		</plugins>
+	</build>
+</project>

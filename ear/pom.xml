@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+<!-- Author: Victor Weng. Acknowledgement: Fei Tian -->
+
+  <groupId>ca.toronto.ccc</groupId>
+  <artifactId>CC-API-Proxy</artifactId>
+  <packaging>ear</packaging>
+  
+  	<properties>
+		<project.ear.name>CC-API-Proxy</project.ear.name>
+		<project.ear.version>1.3.0</project.ear.version>
+	</properties>
+
+    <parent>
+        <groupId>org.membrane-soa</groupId>
+        <artifactId>service-proxy-parent</artifactId>
+        <relativePath>../pom.xml</relativePath>
+		<version>4.0.20</version>
+    </parent>
+	
+	<profiles>
+		<profile>
+			<id>DEV</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<target.env>DEV</target.env>
+			</properties>
+		</profile>
+		<profile>
+			<id>QA</id>
+			<properties>
+				<target.env>QA</target.env>
+			</properties>
+		</profile>
+		<profile>
+			<id>Staging</id>
+			<properties>
+				<target.env>Staging</target.env>
+			</properties>
+		</profile>		
+		<profile>
+			<id>PROD</id>
+			<properties>
+				<target.env>PROD</target.env>
+			</properties>
+		</profile>
+	</profiles>
+	
+	<dependencies>
+		<dependency>
+			  <groupId>ca.toronto.ccc</groupId>
+			  <artifactId>service-proxy-env</artifactId>
+			  <version>${project.version}</version>
+			  <type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>org.membrane-soa</groupId>
+			<artifactId>service-proxy-war</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-ear-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<finalName>${project.ear.name}-${target.env}-${project.ear.version}</finalName>
+					<version>6</version><!-- this indicates the JDK version -->
+					<displayName>${project.ear.name}</displayName>
+					<modules>
+						<webModule>
+						  <groupId>org.membrane-soa</groupId>
+						  <artifactId>service-proxy-war</artifactId>
+						  <bundleFileName>service-proxy-war.war</bundleFileName>
+						  <contextRoot>cc_api</contextRoot>
+						</webModule>
+					</modules>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
