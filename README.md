@@ -51,3 +51,35 @@ Add features like logging or XML Schema validation against a WSDL document:
 	<log />
 </soapProxy>
 ```
+
+Build
+------------------------------------------------------------------------------------------------
+
+Build EAR file with Maven
+Location for EAR files is membrane-cot\ear\target
+Version can be changed from membrane-cot\ear\pom.xml
+
+DEV: 
+mvn package -DskipTests
+
+QA:
+mvn package -DskipTests -PQA  
+
+Staging:
+mvn package -DskipTests -PStaging
+
+PROD:
+mvn package -DskipTests -PPROD
+
+For CC-API, content for DEV and QA is the same, and content for Staging and PROD are the same
+
+QA logs
+http://zelus-a3.corp.toronto.ca/logs/ESD-Common-Internet/ 
+http://nike-a3.corp.toronto.ca/logs/ESD-Common-Internet/
+
+
+update the following JVM property of cc-api-proxy(membrane) and restart the server for switching to Staging
+
+ccapi.targetHost=esb1qa.toronto.ca
+
+
