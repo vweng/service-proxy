@@ -109,6 +109,11 @@ public class TelekomSMSTokenProvider extends SMSTokenProvider {
 	public void init(Router router) {
 		hc = router.getResolverMap().getHTTPSchemaResolver().getHttpClient();
 	}
+
+	@Override
+	protected String normalizeNumber(String number) {
+		return number.replaceAll("\\+", "00").replaceAll("[- ]|\\(.*\\)", "");
+	}
 	
 	protected void sendSMS(String text, String recipientNumber) {
 		recipientNumber = recipientNumber.replaceAll("^00", "\\+");
@@ -119,19 +124,19 @@ public class TelekomSMSTokenProvider extends SMSTokenProvider {
 			JsonGenerator jg = jsonFactory.createJsonGenerator(baos, JsonEncoding.UTF8);
 			
 			jg.writeStartObject();
-			jg.writeObjectFieldStart("outboundSMSMessageRequest");
-			jg.writeArrayFieldStart("address");
-			jg.writeString("tel:" + recipientNumber);
-			jg.writeEndArray();
-			jg.writeStringField("senderAddress", senderAddress);
-			jg.writeObjectFieldStart("outboundSMSTextMessage");
-			jg.writeStringField("message", text);
-			jg.writeEndObject();
-			jg.writeStringField("outboundEncoding", "7bitGSM");
-			jg.writeStringField("clientCorrelator", "" + ((long)(Math.random() * Long.MAX_VALUE)));
-			if (senderName != null)
-				jg.writeStringField("senderName", senderName);
-			jg.writeEndObject();
+				jg.writeObjectFieldStart("outboundSMSMessageRequest");
+					jg.writeArrayFieldStart("address");
+						jg.writeString("tel:" + recipientNumber);
+					jg.writeEndArray();
+					jg.writeStringField("senderAddress", senderAddress);
+					jg.writeObjectFieldStart("outboundSMSTextMessage");
+						jg.writeStringField("message", text);
+					jg.writeEndObject();
+					jg.writeStringField("outboundEncoding", "7bitGSM");
+					jg.writeStringField("clientCorrelator", "" + ((long)(Math.random() * Long.MAX_VALUE)));
+					if (senderName != null)
+						jg.writeStringField("senderName", senderName);
+				jg.writeEndObject();
 			jg.writeEndObject();
 			
 			jg.close();

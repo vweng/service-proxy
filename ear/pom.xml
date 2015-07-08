@@ -9,14 +9,14 @@
   
   	<properties>
 		<project.ear.name>CC-API-Proxy</project.ear.name>
-		<project.ear.version>1.3.5</project.ear.version>
+		<project.ear.version>1.4.0</project.ear.version>
 	</properties>
 
     <parent>
         <groupId>org.membrane-soa</groupId>
         <artifactId>service-proxy-parent</artifactId>
         <relativePath>../pom.xml</relativePath>
-		<version>4.0.20</version>
+		<version>4.0.23</version>
     </parent>
 	
 	<profiles>
