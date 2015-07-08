@@ -68,9 +68,9 @@
 							<copy file="src/ibm-web-ext.xml" tofile="${project.war.dir}/WEB-INF/ibm-web-ext.xml" overwrite="true" />
 							<copy file="src/truststore.jks" tofile="${project.war.dir}/WEB-INF/truststore.jks" overwrite="true" />
 							
-							<copy file="src/schemas/UtilityAccount.json" tofile="${project.war.dir}/WEB-INF/schemas/UtilityAccount.json" overwrite="true" />		
-							<copy file="src/schemas/ParkingTicket.json" tofile="${project.war.dir}/WEB-INF/schemas/ParkingTicket.json" overwrite="true" />
-							<copy file="src/schemas/PropertyTax.json" tofile="${project.war.dir}/WEB-INF/schemas/PropertyTax.json" overwrite="true" />
+							<copy todir="${project.war.dir}/WEB-INF/schemas/" overwrite="true">
+								<fileset dir="src/schemas" includes="*.json" />
+							</copy>
 							
 							<copy file="src/test.jsp" tofile="${project.war.dir}/test.jsp" overwrite="true" />
 							
