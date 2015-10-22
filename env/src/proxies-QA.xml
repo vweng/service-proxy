@@ -115,6 +115,7 @@
 				}
 			}
 		}
+		
 		if (!isValid) {
 			Response.badRequest().contentType("application/json").body('{"error":"Input validation failed"}').build() // must be the last statement, otherwise won't respond
 		}	

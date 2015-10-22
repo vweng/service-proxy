@@ -115,7 +115,6 @@
 				}
 			}
 		}
-		
 		if (!isValid) {
 			Response.badRequest().contentType("application/json").body('{"error":"Input validation failed"}').build() // must be the last statement, otherwise won't respond
 		}	
@@ -190,7 +189,7 @@
 
 			<target host="$p{ccapi.targetHost}" port="5679">
 				<ssl>
-					<truststore location="truststore.jks" password="cc_api" />
+					
 				</ssl>
 			</target>
 		</serviceProxy>
@@ -220,7 +219,7 @@
 
 			<target host="$p{ccapi.targetHost}" port="5679">
 				<ssl>
-					<truststore location="truststore.jks" password="cc_api" />
+					
 				</ssl>
 			</target>
 		</serviceProxy>
@@ -250,7 +249,7 @@
 
 			<target host="$p{ccapi.targetHost}" port="5679">
 				<ssl>
-					<truststore location="truststore.jks" password="cc_api" />
+					
 				</ssl>
 			</target>
 		</serviceProxy>
@@ -281,7 +280,6 @@
 
 			<target host="$p{ccapi.targetHost}" port="5679">
 				<ssl>
-					<truststore location="truststore.jks" password="cc_api" />
 				</ssl>
 			</target>
 		</serviceProxy>

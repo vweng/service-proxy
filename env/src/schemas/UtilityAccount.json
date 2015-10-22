@@ -1,39 +1,37 @@
 {
-	"type":"object",
-	"$schema": "http://json-schema.org/draft-04/schema",
-	"id": "https://secure.toronto.ca/cc_api/svcaccount_v1/UtilityAccount/validate",
-	"required":true,
-	"properties":{
-		"QAList": {
-			"type":"array",
-			"required":true,
-			"items":
-				{
-					"type":"object",
-					"required":true,
-					"properties":{
-						"answer": {
-							"type":"string",
-							"required":true,
-							"maxLength":100
-						},
-						"question": {
-							"type":"string",
-							"required":true,
-							"maxLength":100
-						}
-					}
-				}
-		},
-		"accountNumber": {
-			"type":"string",
-			"required":true,
-			"maxLength":40
-		},
-		"accountType": {
-			"type":"string",
-			"required":true,
-			"maxLength":40
-		}
-	}
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "id": "https://secure.toronto.ca/cc_api/svcaccount_v1/UtilityAccount",
+  "additionalProperties": false,
+  "required": [
+    "QAList",
+    "accountNumber",
+    "accountType"
+  ],
+  "properties": {
+    "QAList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "question": {
+            "type": "string",
+            "maxLength": 100
+          }
+        }
+      }
+    },
+    "accountNumber": {
+      "type": "string",
+      "maxLength": 40
+    },
+    "accountType": {
+      "type": "string",
+      "maxLength": 40
+    }
+  }
 }
