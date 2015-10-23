@@ -32,7 +32,18 @@
 		<spring:property name="placeholderPrefix" value="$p{" />
     	<spring:property name="placeholderSuffix" value="}" />
 	</spring:bean>
-  
+
+	<groovy id="api-preflight">
+		if (exc.request.method==Request.METHOD_OPTIONS) { // note that the preflight response may be cached by browser
+			def allowHeadersKey = 'Access-Control-Allow-Headers'
+			def requestMethodKey = 'Access-Control-Request-Method'
+			def allowHeader = exc.request.header.getFirstValue(allowHeadersKey)
+			Response.ok().header(allowHeadersKey, allowHeader?allowHeader:'')
+						 .header(requestMethodKey, 'GET, POST') // cc-api only supports GET and POST so far
+						 .build() // must be the last statement, otherwise won't respond
+		}
+	</groovy>
+
 	<groovy id="api-request-setup">
 		def ua = exc.request.header.getFirstValue("User-Agent")
 		def ct = exc.request.header.getFirstValue("Content-Type")
@@ -47,7 +58,7 @@
 			exc.request.header.add("Content-Type", "application/x-www-form-urlencoded")
 		}
 		
-		if (ex &amp;&amp; ex.contains("100-Continue")) {
+		if (ex) {
 			exc.request.header.removeFields("Expect") // remove Expect: 100-Continue header injected by WAS8.0, otherwise wM flops
 		}
 		
@@ -178,7 +189,8 @@
 					<map do="rewrite" from="^/svcaccount_v1/UtilityAccount/(\d{9}-\d{9}-\d{2}(\?.*|$))" 
 						to="/rest/COTIdmaAccountAccessAPI/REST/svcaccount_v1/UtilityAccount/$1" />
 				</rewriter>
-				<groovy>					
+				<spring:ref bean="api-preflight" />
+				<groovy>	
 					if (exc.request.method==Request.METHOD_POST||exc.request.method==Request.METHOD_GET) {
 						exc.setProperty("X-JSON-KEY", "validateRequest=");
 					} else {
@@ -210,6 +222,7 @@
 					<map do="rewrite" from="^/svcaccount_v1/ParkingTicket/view\?(.*)" 
 						to="/rest/COTIdmaAccountAccessAPI/REST/svcaccount_v1/ParkingTicket/view?$1" />
 				</rewriter>
+				<spring:ref bean="api-preflight" />
 				<groovy>
 					if (exc.request.method!=Request.METHOD_GET) {
 						Response.badRequest().contentType("application/json").body('{"error":"Invalid action"}').build() // must be the last statement, otherwise won't respond
@@ -240,6 +253,7 @@
 					<map do="rewrite" from="^/svcaccount_v1/PropertyTax/view\?(.*)" 
 						to="/rest/COTIdmaAccountAccessAPI/REST/svcaccount_v1/PropertyTax/view?$1" />
 				</rewriter>
+				<spring:ref bean="api-preflight" />
 				<groovy>
 					if (exc.request.method!=Request.METHOD_GET) {
 						Response.badRequest().contentType("application/json").body('{"error":"Invalid action"}').build() // must be the last statement, otherwise won't respond
@@ -269,6 +283,7 @@
 					<map do="rewrite" from="^/svcaccount_v1/WaterAccount/(validate|accountdetails|consumption|groupconsumption|weatherdata)(\?.*|$)" 
 										to="/rest/COTIdmaAccountAccessAPI/REST/svcaccount_v1/WaterAccount/$1$2" />                                                                            
 				</rewriter>
+				<spring:ref bean="api-preflight" />
 				<groovy>                                                                             
 					if (exc.request.method==Request.METHOD_POST||exc.request.method==Request.METHOD_GET) {
 						// good
