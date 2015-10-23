@@ -55,12 +55,17 @@
 		exc.request.header.setAuthorization("cc_api", System.getProperty("ccapi.password"));
 	</groovy>
 
-	
-    <groovy id="api-response-setup">
-		def ach = exc.response.header.getFirstValue("Access-Control-Allow-Origin");
-		if (!ach) { // multiple values could result in disabled CORS, must have at most 1.
-			exc.response.header.add("Access-Control-Allow-Origin", "*.toronto.ca"); 
-		}					
+	<groovy id="api-response-setup">
+    	exc.response.header.removeFields("Access-Control-Allow-Origin")
+    	def origin=exc.request.header.getFirstValue("Origin");
+		try {
+			def netUrl = new URL(origin);
+			if (!netUrl.getHost().endsWith(".toronto.ca")) 
+				origin = "https://secure.toronto.ca";
+		} catch (Exception e) {
+			println "----- Failed to setup the origin Header ${origin} with error: " + e.toString();
+		}
+		exc.response.header.add("Access-Control-Allow-Origin", origin);	
     </groovy>
 
     <groovy id="prep-input-validation">
