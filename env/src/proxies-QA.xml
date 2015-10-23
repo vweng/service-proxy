@@ -56,17 +56,19 @@
 	</groovy>
 
 	<groovy id="api-response-setup">
-    	exc.response.header.removeFields("Access-Control-Allow-Origin")
-    	def origin=exc.request.header.getFirstValue("Origin");
-		try {
-			def netUrl = new URL(origin);
-			if (!netUrl.getHost().endsWith(".toronto.ca")) 
-				origin = "https://secure.toronto.ca";
-		} catch (Exception e) {
-			println "----- Failed to setup the origin Header ${origin} with error: " + e.toString();
-		}
+		def origin="https://secure.toronto.ca";
+		def firstOrigin=exc.request.header?exc.request.header.getFirstValue("Origin"):null;
+		if (firstOrigin)
+			try {
+				def netUrl = new URL(firstOrigin);
+				if (netUrl.getHost().endsWith(".toronto.ca")) 
+					origin = exc.request.header.getFirstValue("Origin");
+			} catch (Exception e) {
+				println "----- Failed to setup origin ${firstOrigin} with error: " + e.toString();
+			}
+		exc.response.header.removeFields("Access-Control-Allow-Origin")
 		exc.response.header.add("Access-Control-Allow-Origin", origin);	
-    </groovy>
+	</groovy>
 
     <groovy id="prep-input-validation">
     	// To get the validator tag to perform JSON schema validation, we need to extract query parameters and set it to http body.
