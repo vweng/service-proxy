@@ -40,7 +40,7 @@
 						 .header('Access-Control-Allow-Methods', 'GET, POST') // cc-api only supports GET and POST so far
 						 .build() // must be the last statement, otherwise won't respond
 						 
-		} else if (!exc.getProperty("X-ALLOW-METHODS").contains(exc.request.method) {
+		} else if (!exc.getProperty("X-ALLOW-METHODS").contains(exc.request.method)) {
 			Response.badRequest().contentType("application/json").body('{"error":"Invalid action method"}').build()  // must be the last statement, otherwise won't respond
 		}
 	</groovy>
