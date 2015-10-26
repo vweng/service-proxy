@@ -63,7 +63,7 @@
 						  you can add between <target> and </target> in a
 						  build.xml.
 						-->
-							<copy file="src/proxies-${target.env}.xml" tofile="${project.war.dir}/WEB-INF/proxies.xml" overwrite="true" />
+							<copy file="src/proxies-DEV.xml" tofile="${project.war.dir}/WEB-INF/proxies.xml" overwrite="true" />
 							<copy file="src/ibm-web-bnd.xml" tofile="${project.war.dir}/WEB-INF/ibm-web-bnd.xml" overwrite="true" />
 							<copy file="src/ibm-web-ext.xml" tofile="${project.war.dir}/WEB-INF/ibm-web-ext.xml" overwrite="true" />
 							<copy file="src/truststore.jks" tofile="${project.war.dir}/WEB-INF/truststore.jks" overwrite="true" />
@@ -74,16 +74,17 @@
 							
 							<copy file="src/test.jsp" tofile="${project.war.dir}/test.jsp" overwrite="true" />
 							
-							<!-- taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
+							<taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
 							<if>
-							  <equals arg1="${target.env}" arg2="PROD" />
+							  <contains string="PROD,Staging" substring="${target.env}" />
 							  <then>
-								<copy file="src/testPROD.jsp" tofile="${project.war.dir}/test.jsp" overwrite="true" />
+								<replace file="${project.war.dir}/WEB-INF/proxies.xml">
+									<replacetoken><![CDATA[<truststore location="truststore.jks" password="cc_api" />]]></replacetoken>
+									<replacevalue><![CDATA[ ]]></replacevalue>
+									<!-- no truststore required as PROD/Staging use commercial certs -->
+								</replace>
 							  </then>
-							  <else>
-								<copy file="src/test.jsp" tofile="${project.war.dir}/test.jsp" overwrite="true" />
-							  </else>
-							</if -->
+							</if>
 
 					  </tasks>
 					</configuration>
