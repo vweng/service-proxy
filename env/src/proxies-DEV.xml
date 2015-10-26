@@ -35,12 +35,13 @@
 
 	<groovy id="api-preflight">
 		if (exc.request.method==Request.METHOD_OPTIONS) { // note that the preflight response may be cached by browser
-			def allowHeadersKey = 'Access-Control-Allow-Headers'
-			def requestMethodKey = 'Access-Control-Request-Method'
-			def allowHeader = exc.request.header.getFirstValue(allowHeadersKey)
-			Response.ok().header(allowHeadersKey, allowHeader?allowHeader:'')
-						 .header(requestMethodKey, 'GET, POST') // cc-api only supports GET and POST so far
+			def requestHeaders = exc.request.header.getFirstValue('Access-Control-Request-Headers')
+			Response.ok().header('Access-Control-Allow-Headers', requestHeaders?requestHeaders:'origin, content-type, accept')
+						 .header('Access-Control-Allow-Methods', 'GET, POST') // cc-api only supports GET and POST so far
 						 .build() // must be the last statement, otherwise won't respond
+						 
+		} else if (!exc.getProperty("X-ALLOW-METHODS").contains(exc.request.method) {
+			Response.badRequest().contentType("application/json").body('{"error":"Invalid action method"}').build()  // must be the last statement, otherwise won't respond
 		}
 	</groovy>
 
@@ -96,6 +97,7 @@
 		}
 		// verify if there is more than one json= param in querystr, if so report error
 		if ((queryStr =~ /${jsonKey}/).count &gt; 1) {
+			println "[CC-API Warning] Invalid jsonKey detected ==> ${jsonKey}"
 			isValid = false;
 		} else {
 			def params = queryStr.split("&amp;");
@@ -113,6 +115,7 @@
 						// jQuery callback is 41 chars: jQuery111009626693264581263_1427919355740
 						continue
 					} else {
+						println "[CC-API Warning] Invalid callback param detected"
 						isValid = false;
 						break;
 					}
@@ -121,6 +124,7 @@
 					if (params[i] ==~ /^_=\d{1,15}$/) { // jQuery time seed is 13 digits
 						continue;
 					} else {
+						println "[CC-API Warning] Invalid jQuery seed param detected"
 						isValid = false;
 						break;
 					}
@@ -135,7 +139,9 @@
 		}
 		
 		if (!isValid) {
-			Response.badRequest().contentType("application/json").body('{"error":"Input validation failed"}').build() // must be the last statement, otherwise won't respond
+			// Response.badRequest().contentType("application/json").body('{"error":"Input validation failed"}').build() // must be the last statement, otherwise won't respond
+			ABORT // validate failure is equal to IOException, should log but NOT return due to security concern. 
+			// Using ABORT here to make it matching the behavior when the JSON validator tag failed with JSONParseException, which is IOException
 		}	
     </groovy>
 
@@ -189,15 +195,12 @@
 					<map do="rewrite" from="^/svcaccount_v1/UtilityAccount/(\d{9}-\d{9}-\d{2}(\?.*|$))" 
 						to="/rest/COTIdmaAccountAccessAPI/REST/svcaccount_v1/UtilityAccount/$1" />
 				</rewriter>
-				<spring:ref bean="api-preflight" />
-				<groovy>	
-					if (exc.request.method==Request.METHOD_POST||exc.request.method==Request.METHOD_GET) {
-						exc.setProperty("X-JSON-KEY", "validateRequest=");
-					} else {
-						Response.badRequest().contentType("application/json").body('{"error":"Invalid action"}').build()  // must be the last statement, otherwise won't respond
-					}
+
+				<groovy>
+					exc.setProperty("X-JSON-KEY", "validateRequest=") // for legacy compatibility as new APIs all use "json=" standard
+					exc.setProperty("X-ALLOW-METHODS", Request.METHOD_GET+","+Request.METHOD_POST)
 				</groovy>
-				
+				<spring:ref bean="api-preflight" />				
 				<spring:ref bean="api-request-setup" />
 				<spring:ref bean="prep-input-validation" />
 				<validator jsonSchema="schemas/UtilityAccount.json"  failureHandler="log" />
@@ -222,13 +225,11 @@
 					<map do="rewrite" from="^/svcaccount_v1/ParkingTicket/view\?(.*)" 
 						to="/rest/COTIdmaAccountAccessAPI/REST/svcaccount_v1/ParkingTicket/view?$1" />
 				</rewriter>
-				<spring:ref bean="api-preflight" />
+				
 				<groovy>
-					if (exc.request.method!=Request.METHOD_GET) {
-						Response.badRequest().contentType("application/json").body('{"error":"Invalid action"}').build() // must be the last statement, otherwise won't respond
-					}
+					exc.setProperty("X-ALLOW-METHODS", Request.METHOD_GET)
 				</groovy>
-
+				<spring:ref bean="api-preflight" />
 				<spring:ref bean="api-request-setup" />
 				<spring:ref bean="prep-input-validation" />
 				<validator jsonSchema="schemas/ParkingTicket.json"  failureHandler="log" />
@@ -253,13 +254,11 @@
 					<map do="rewrite" from="^/svcaccount_v1/PropertyTax/view\?(.*)" 
 						to="/rest/COTIdmaAccountAccessAPI/REST/svcaccount_v1/PropertyTax/view?$1" />
 				</rewriter>
-				<spring:ref bean="api-preflight" />
+				
 				<groovy>
-					if (exc.request.method!=Request.METHOD_GET) {
-						Response.badRequest().contentType("application/json").body('{"error":"Invalid action"}').build() // must be the last statement, otherwise won't respond
-					}
+					exc.setProperty("X-ALLOW-METHODS", Request.METHOD_GET)
 				</groovy>
-
+				<spring:ref bean="api-preflight" />
 				<spring:ref bean="api-request-setup" />
 				<spring:ref bean="prep-input-validation" />
 				<validator jsonSchema="schemas/PropertyTax.json"  failureHandler="log" />
@@ -283,15 +282,11 @@
 					<map do="rewrite" from="^/svcaccount_v1/WaterAccount/(validate|accountdetails|consumption|groupconsumption|weatherdata)(\?.*|$)" 
 										to="/rest/COTIdmaAccountAccessAPI/REST/svcaccount_v1/WaterAccount/$1$2" />                                                                            
 				</rewriter>
-				<spring:ref bean="api-preflight" />
-				<groovy>                                                                             
-					if (exc.request.method==Request.METHOD_POST||exc.request.method==Request.METHOD_GET) {
-						// good
-					} else {
-						Response.badRequest().contentType("application/json").body('{"error":"Invalid action"}').build() // must be the last statement, otherwise won't respond
-					}
+				
+				<groovy>
+					exc.setProperty("X-ALLOW-METHODS", Request.METHOD_GET+","+Request.METHOD_POST)
 				</groovy>
-
+				<spring:ref bean="api-preflight" />
 				<spring:ref bean="api-request-setup" />
 				<spring:ref bean="prep-input-validation" />
 				<validator jsonSchema="schemas/WaterAccount.json"  failureHandler="log" />
