@@ -139,9 +139,7 @@
 		}
 		
 		if (!isValid) {
-			// Response.badRequest().contentType("application/json").body('{"error":"Input validation failed"}').build() // must be the last statement, otherwise won't respond
-			ABORT // validate failure is equal to IOException, should log but NOT return due to security concern. 
-			// Using ABORT here to make it matching the behavior when the JSON validator tag failed with JSONParseException, which is IOException
+			ABORT  // to be intercepted by abortInterceptor
 		}	
     </groovy>
 
@@ -156,8 +154,14 @@
 		}
 	</groovy>
   
+    <spring:bean id="abortInterceptor" class="ccc.AbortInterceptor">
+		<spring:property name="responseContentType" value="application/json" />
+		<spring:property name="responseContent" value='{"error":"Invalid request."}' />
+	</spring:bean>
+
 	<router hotDeploy="false" exchangeStore="memoryExchangeStore">
 		<web:servletTransport id="transport">
+			<interceptor refid="abortInterceptor" />  
 			<limit maxBodyLength="1024000" />
 			<headerFilter>
 				<exclude>Connection</exclude>
