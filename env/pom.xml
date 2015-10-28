@@ -46,6 +46,7 @@
 	</profiles>
 	
 	<properties>
+		<project.java.dir>../war/src/main/java</project.java.dir>
 		<project.war.dir>../war/src/main/webapp</project.war.dir>
 	</properties>
 
@@ -54,15 +55,25 @@
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
+					<execution>
+					  <id>1</id>
+					  <phase>generate-sources</phase>
+					  <configuration>
+						<tasks>
+							<copy file="src/java/ccc/AbortInterceptor.java" tofile="${project.java.dir}/ccc/AbortInterceptor.java" overwrite="true" />
+						</tasks>
+					  </configuration>
+					  <goals>
+						<goal>run</goal>
+					  </goals>
+					</execution>
+					
 				  <execution>
-					<phase>process-sources</phase>
+					<id>2</id>
+					<phase>package</phase>
 					<configuration>
 					  <tasks>
-						<!--
-						  Place any Ant task here. You can add anything
-						  you can add between <target> and </target> in a
-						  build.xml.
-						-->
+							<!-- Prepare custom package for building EAR for websphere -->
 							<copy file="src/proxies-DEV.xml" tofile="${project.war.dir}/WEB-INF/proxies.xml" overwrite="true" />
 							<copy file="src/ibm-web-bnd.xml" tofile="${project.war.dir}/WEB-INF/ibm-web-bnd.xml" overwrite="true" />
 							<copy file="src/ibm-web-ext.xml" tofile="${project.war.dir}/WEB-INF/ibm-web-ext.xml" overwrite="true" />
@@ -92,6 +103,26 @@
 					  <goal>run</goal>
 					</goals>
 				  </execution>
+				  
+					<execution>
+					  <id>3</id>
+					  <phase>clean</phase>
+					  <configuration>
+						<tasks>
+					  		<delete dir="${project.java.dir}/ccc" />
+							<delete dir="${project.war.dir}/WEB-INF/schemas/" />
+							<copy file="src/proxies-ORIGIN.xml" tofile="${project.war.dir}/WEB-INF/proxies.xml" overwrite="true" failonerror="false" />
+							<delete file="${project.war.dir}/WEB-INF/ibm-web-bnd.xml" />
+							<delete file="${project.war.dir}/WEB-INF/ibm-web-ext.xml" />
+							<delete file="${project.war.dir}/WEB-INF/truststore.jks" />
+							<delete file="${project.war.dir}/test.jsp" />
+						</tasks>
+					  </configuration>
+					  <goals>
+						<goal>run</goal>
+					  </goals>
+					</execution>
+
 				</executions>
 				<dependencies>
 				  <dependency>
