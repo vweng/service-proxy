@@ -12,15 +12,15 @@
 	<packaging>jar</packaging>
 
 	<parent>
-		<groupId>org.membrane-soa</groupId>
+		<groupId>org.membrane-soa.service-proxy</groupId>
 		<artifactId>service-proxy-parent</artifactId>
 		<relativePath>../pom.xml</relativePath>
-		<version>4.0.23</version>
+		<version>4.0.27-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.membrane-soa</groupId>
+			<groupId>org.membrane-soa.service-proxy</groupId>
 			<artifactId>service-proxy-annot</artifactId>
 		</dependency>
 
@@ -198,7 +198,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.membrane-soa</groupId>
+			<groupId>org.membrane-soa.service-proxy</groupId>
 			<artifactId>service-proxy-test</artifactId>
 			<scope>test</scope>
 		</dependency>

@@ -12,26 +12,26 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
---><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     
     <modelVersion>4.0.0</modelVersion>
     <artifactId>service-proxy-war</artifactId>
     <packaging>war</packaging>
 
     <parent>
-        <groupId>org.membrane-soa</groupId>
+        <groupId>org.membrane-soa.service-proxy</groupId>
         <artifactId>service-proxy-parent</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>4.0.23</version>
+        <version>4.0.27-SNAPSHOT</version>
     </parent>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.membrane-soa</groupId>
+			<groupId>org.membrane-soa.service-proxy</groupId>
 			<artifactId>service-proxy-annot</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.membrane-soa</groupId>
+			<groupId>org.membrane-soa.service-proxy</groupId>
 			<artifactId>service-proxy-core</artifactId>
 		</dependency>
 		
@@ -59,7 +59,7 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.membrane-soa</groupId>
+			<groupId>org.membrane-soa.service-proxy</groupId>
 			<artifactId>service-proxy-test</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -86,6 +86,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
+
 				<configuration>
 					<!-- added by Victor
 					Exclude xml-apis-*.jar since it conflicts with WebSphere's built-in one
@@ -95,6 +96,7 @@
 						WEB-INF/lib/xml-apis-*.jar
 					</packagingExcludes>
 				</configuration>
+
 			</plugin>
 		 	<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
