@@ -91,7 +91,6 @@
 							<copy file="src/proxies-DEV.xml" tofile="${project.war.dir}/WEB-INF/proxies.xml" overwrite="true" />
 							<copy file="src/ibm-web-bnd.xml" tofile="${project.war.dir}/WEB-INF/ibm-web-bnd.xml" overwrite="true" />
 							<copy file="src/ibm-web-ext.xml" tofile="${project.war.dir}/WEB-INF/ibm-web-ext.xml" overwrite="true" />
-							<copy file="src/truststore.jks" tofile="${project.war.dir}/WEB-INF/truststore.jks" overwrite="true" />
 							
 							<copy todir="${project.war.dir}/WEB-INF/schemas/" overwrite="true">
 								<fileset dir="src/schemas" includes="*.json" />
@@ -99,6 +98,7 @@
 							
 							<copy file="src/test.jsp" tofile="${project.war.dir}/test.jsp" overwrite="true" />
 							
+							<!--
 							<taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
 							<if>
 							  <contains string="PROD,Staging" substring="${target.env}" />
@@ -106,10 +106,10 @@
 								<replace file="${project.war.dir}/WEB-INF/proxies.xml">
 									<replacetoken><![CDATA[<truststore location="truststore.jks" password="cc_api" />]]></replacetoken>
 									<replacevalue><![CDATA[ ]]></replacevalue>
-									<!-- no truststore required as PROD/Staging use commercial certs -->
 								</replace>
 							  </then>
 							</if>
+							-->
 
 					  </tasks>
 					</configuration>
