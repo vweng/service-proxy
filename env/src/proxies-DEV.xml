@@ -215,9 +215,7 @@
 			</response>
 
 			<target host="$p{ccapi.targetHost}" port="5679">
-				<ssl>
-					<truststore location="truststore.jks" password="cc_api" />
-				</ssl>
+				<ssl ignoreTimestampCheckFailure="#{'true'.equals(systemProperties['ccapi.trustAnyone'])}" />
 			</target>
 		</serviceProxy>
 
@@ -244,9 +242,7 @@
 			</response>
 
 			<target host="$p{ccapi.targetHost}" port="5679">
-				<ssl>
-					<truststore location="truststore.jks" password="cc_api" />
-				</ssl>
+				<ssl ignoreTimestampCheckFailure="#{'true'.equals(systemProperties['ccapi.trustAnyone'])}" />
 			</target>
 		</serviceProxy>
 
@@ -273,9 +269,7 @@
 			</response>
 
 			<target host="$p{ccapi.targetHost}" port="5679">
-				<ssl>
-					<truststore location="truststore.jks" password="cc_api" />
-				</ssl>
+				<ssl ignoreTimestampCheckFailure="#{'true'.equals(systemProperties['ccapi.trustAnyone'])}" />
 			</target>
 		</serviceProxy>
 
@@ -301,9 +295,7 @@
 			</response>
 
 			<target host="$p{ccapi.targetHost}" port="5679">
-				<ssl>
-					<truststore location="truststore.jks" password="cc_api" />
-				</ssl>
+				<ssl ignoreTimestampCheckFailure="#{'true'.equals(systemProperties['ccapi.trustAnyone'])}" />
 			</target>
 		</serviceProxy>
 	</router>
